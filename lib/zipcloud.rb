@@ -20,17 +20,17 @@ module Zipcloud
   end
 
   class PostalAddress
-    attr_reader :state, :city, :town
-    attr_reader :state_kana, :city_kana, :town_kana, :zipcode, :prefcode
+    attr_reader :address1, :address2, :address3
+    attr_reader :kana1, :kana2, :kana3, :zipcode, :prefcode
 
     def initialize zipcloud_results
-      @state = zipcloud_results["address1"]
-      @city = zipcloud_results["address2"]
-      @town = zipcloud_results["address3"]
+      @address1 = zipcloud_results["address1"]
+      @address2 = zipcloud_results["address2"]
+      @address3 = zipcloud_results["address3"]
 
-      @state_kana = zipcloud_results["kana1"]
-      @city_kana = zipcloud_results["kana2"]
-      @town_kana = zipcloud_results["kana3"]
+      @kana1 = zipcloud_results["kana1"]
+      @kana2 = zipcloud_results["kana2"]
+      @kana3 = zipcloud_results["kana3"]
 
       @zipcode = zipcloud_results["zipcode"]
       @prefcode = zipcloud_results["prefcode"]
