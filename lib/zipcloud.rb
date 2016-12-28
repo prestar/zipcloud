@@ -2,11 +2,17 @@ require "zipcloud/version"
 require "net/http"
 require "json"
 
+class String
+  include Zipcloud
+end
+
 module Zipcloud
   ZipCloud_URL = "zipcloud.ibsnet.co.jp"
 
-  def self.to_postal_addresses zipcode
-    data = JSON.parse(send_to_zipcloud zipcode)
+  def to_postal_addresses
+    data = JSON.parse(send_to_zipcloud self)
+
+    error? data
 
     data["results"].collect do |dat|
       PostalAddress.new dat
@@ -14,7 +20,9 @@ module Zipcloud
   end
 
   class PostalAddress
-    attr_reader :state, :city, :town, :state_kana, :city_kana, :town_kana, :zipcode, :prefcode
+    attr_reader :state, :city, :town
+    attr_reader :state_kana, :city_kana, :town_kana, :zipcode, :prefcode
+
     def initialize zipcloud_results
       @state = zipcloud_results["address1"]
       @city = zipcloud_results["address2"]
@@ -29,11 +37,19 @@ module Zipcloud
     end
   end
 
-  def self.send_to_zipcloud zipcode
+  private
+  def send_to_zipcloud zipcode
     response = Net::HTTP.new(ZipCloud_URL, 80).start do |svr|
       svr.get("/api/search?" + "zipcode=" + zipcode)
     end
 
     response.body
+  end
+
+  def error? data
+    return false if data["status"] == 200
+
+    raise "ERROR CODE:#{data["status"]} #{data["message"]}"
+    return true
   end
 end
